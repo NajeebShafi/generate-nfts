@@ -1,1 +1,1 @@
-# genertate-nfts
+# generate-nfts
