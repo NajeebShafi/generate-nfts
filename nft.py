@@ -7,7 +7,6 @@ import time
 import os
 import glob
 import random
-from progressbar import progressbar
 
 import warnings
 
