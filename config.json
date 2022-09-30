@@ -1,0 +1,41 @@
+{
+  "name": "testNFTs",
+  "number_of_nfts": 10,
+  "layers": [
+    {
+      "id": 1,
+      "name": "background",
+      "directory": "Background"
+    },
+    {
+      "id": 2,
+      "name": "face_color",
+      "directory": "Face Color"
+    },
+    {
+      "id": 3,
+      "name": "face_shape",
+      "directory": "Face Shape"
+    },
+    {
+      "id": 4,
+      "name": "eye_color",
+      "directory": "Eye Color"
+    },
+    {
+      "id": 5,
+      "name": "eye_shape",
+      "directory": "Eye Shape"
+    },
+    {
+      "id": 6,
+      "name": "nose",
+      "directory": "Nose"
+    },
+    {
+      "id": 7,
+      "name": "lips",
+      "directory": "Lips"
+    }
+  ]
+}
