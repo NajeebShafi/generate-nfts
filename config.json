@@ -1,5 +1,7 @@
 {
   "name": "testNFTs",
+  "description": "testNFTs description",
+  "base_image_url": "ipfs://<-- Your CID Code-->",
   "number_of_nfts": 10,
   "layers": [
     {

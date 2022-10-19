@@ -1,6 +1,7 @@
 # Import required libraries
+import datetime
 import json
-from collections import defaultdict
+from collections import defaultdict, Counter
 from math import comb
 from PIL import Image
 import time
@@ -11,6 +12,20 @@ import random
 import warnings
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
+def generate_meta_json(traits, album,image_name, config):
+    import json
+    meta_data = {
+        "name": f"{album} #{image_name}",
+        "description": f"{config['description']}" ,
+        "image": f"{config['base_image_url']}.png",
+        "edition": 1,
+        "date": datetime.datetime.now().timestamp(),
+        "attributes":traits,
+    }
+    json_object = json.dumps(meta_data, indent=4)
+    with open(os.path.join("output", album, image_name + ".json"), "w") as outfile:
+        outfile.write(json_object)
+
 
 def generate_single_image(filepaths, output_filename=None):
     bg = Image.open(os.path.join(filepaths[0]))
@@ -47,16 +62,23 @@ def get_traits(layers):
 
     return traits, image_count
 
-def generate_nfts(traits, number_of_images, album, remove_duplicates=False):
+def generate_nfts(traits, number_of_images, album, config, remove_duplicates=True, generate_rarity_table=False, generate_commons_table=False):
     start = time.time()
 
+    rarity_table = {}
     used_traits = []
     for i in range(number_of_images):
         file_name = f"{i}"
         image_traits = []
-        for trait_value in traits.values():
+        image_traits_dict = []
+        for trait_key, trait_value in traits.items():
             image = trait_value[random.randint(0, len(trait_value) - 1)]
             image_traits.append(image)
+            image_traits_dict.append({"trait_type":trait_key,"value":image.split("/")[2]})
+            if rarity_table.get(f"{trait_key}"):
+                rarity_table[f"{trait_key}"].append(image.split("/")[2])
+            else:
+                rarity_table[f"{trait_key}"] = [image.split("/")[2]]
 
         if image_traits in used_traits:
             file_name += f"duplicate_of_{used_traits.index(image_traits)}"
@@ -67,6 +89,7 @@ def generate_nfts(traits, number_of_images, album, remove_duplicates=False):
             os.makedirs(os.path.join("output", album))
 
         generate_single_image(image_traits, os.path.join("output", album, file_name + ".png"))
+        generate_meta_json(image_traits_dict, album, file_name, config)
 
     if remove_duplicates:
         print("in duplicates")
@@ -76,6 +99,17 @@ def generate_nfts(traits, number_of_images, album, remove_duplicates=False):
     end = time.time()
     elapsed_seconds = float("%.2f" % (end - start))
     print(f"Time took generate nfts is {elapsed_seconds} seconds")
+    if generate_rarity_table:
+        print()
+        print(f"Generating Rarity Table")
+        for key, value in rarity_table.items():
+            print(f"{key}: {dict(Counter(value))}")
+
+    if generate_commons_table:
+        print()
+        print(f"Generating Common Table")
+        for key, value in rarity_table.items():
+            print(f"{key}: {Counter(value).most_common(1)[0][0]}")
 
 
 def main():
@@ -100,7 +134,7 @@ def main():
     if image_count <= 0:
         print("Kindly add assets to run this command")
     else:
-        generate_nfts(traits, number_of_nfts, album)
+        generate_nfts(traits, number_of_nfts, album, config, generate_rarity_table=True, generate_commons_table=True)
 
 
 # Run the main function
