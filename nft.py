@@ -3,7 +3,8 @@ import datetime
 import json
 from collections import defaultdict, Counter
 from math import comb
-from PIL import Image
+from PIL import Image, ImageFilter
+
 import time
 import os
 import glob
@@ -33,7 +34,18 @@ def generate_single_image(filepaths, output_filename=None):
     for filepath in filepaths[1:]:
         if filepath.endswith('.png'):
             img = Image.open(os.path.join(filepath))
-            bg.paste(img, (0, 0), img)
+            img2 = img.copy()
+            if "#enhance" in filepath:
+                img2 = img2.filter(ImageFilter.EDGE_ENHANCE_MORE)
+            if "#smooth" in filepath:
+                img2 = img2.filter(ImageFilter.SMOOTH_MORE)
+            if "#contour" in filepath:
+                img2 = img2.filter(ImageFilter.CONTOUR)
+            if "#detail" in filepath:
+                img2 = img2.filter(ImageFilter.DETAIL)
+            if "#blur" in filepath:
+                img2 = img2.filter(ImageFilter.BoxBlur(5))
+            bg.paste(img2, (0, 0), img2)
 
     if output_filename is not None:
 
